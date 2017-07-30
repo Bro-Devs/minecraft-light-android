@@ -22,6 +22,10 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
+    int MINECRAFT_TIME_MAX_SPAN = 4000;
+    int LIGHT_SENSOR_MAX_SPAN = 3000;
+    int MINECRAFT_START_TIME = 22000;
+
     private SensorManager sensorManager;
     private Sensor lightSensor;
     private Rcon rcon;
@@ -136,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         // (light * 4000 / 3000) + 22000
 
         if (rcon != null){
-            mineTime = (int) ((light * 4000/3000) + 22000);
+            mineTime = (int) ((light * MINECRAFT_TIME_MAX_SPAN/LIGHT_SENSOR_MAX_SPAN) + MINECRAFT_START_TIME);
             luminosityView.setText(String.valueOf(light));
             timeView.setText(String.valueOf(mineTime));
 
