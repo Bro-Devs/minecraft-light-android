@@ -22,9 +22,10 @@ import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
-    int MINECRAFT_TIME_MAX_SPAN = 4000;
-    int LIGHT_SENSOR_MAX_SPAN = 3000;
-    int MINECRAFT_START_TIME = 22000;
+    private static int MINECRAFT_TIME_MAX_SPAN = 4000;
+    private static int LIGHT_SENSOR_MAX_SPAN = 3000;
+    private static int MINECRAFT_START_TIME = 22000;
+    private static String APP_TAG = "MinecraftLight";
 
     private SensorManager sensorManager;
     private Sensor lightSensor;
@@ -65,8 +66,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 sensorManager.registerListener(sensorEventListener, lightSensor, SensorManager.SENSOR_DELAY_UI);
                 connectToServer();
                 sendRequestsToServer();
-                serverView.setVisibility(View.INVISIBLE);
-                infoView.setVisibility(View.VISIBLE);
+
+                AnimationTools.startCircularReveal(infoView);
 
             }
         });
@@ -87,9 +88,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                         // light senor yet
                         if (mineTime != 0) {
                             if (mineTime > 29000) {
-                                Log.e("MinecraftLight", rcon.command("time set " + 29000));
+                                Log.i(APP_TAG, rcon.command("time set " + 29000));
                             } else {
-                                Log.e("MinecraftLight", rcon.command("time set " + mineTime));
+                                Log.i(APP_TAG, rcon.command("time set " + mineTime));
                             }
                         }
                     } catch (IOException e) {
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                             addressEditText.getText().toString(),
                             Integer.parseInt(portEditText.getText().toString()),
                             passwordEditText.getText().toString().getBytes());
+                    rcon.command("gamerule doDaylightCycle false");
 
                 // TODO: Handle exceptions
                 } catch (IOException e) {

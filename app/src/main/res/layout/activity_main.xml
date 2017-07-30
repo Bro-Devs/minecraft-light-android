@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp"
     tools:context="com.github.brodevs.minecraft_light_android.MainActivity">
 
     <FrameLayout
+        android:visibility="visible"
         android:id="@+id/activity_main_view_server"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="16dp">
        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -74,10 +75,18 @@
         android:id="@+id/activity_main_view_info"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clickable="true"
         android:visibility="invisible">
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/background"
+            android:scaleType="centerCrop"
+            android:clickable="true" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:padding="16dp"
             android:orientation="vertical">
             <LinearLayout
                 android:layout_width="match_parent"
@@ -88,12 +97,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:textColor="@color/colorWhite"
                     android:paddingTop="8dp"
                     android:text="Phone Luminosity" />
                 <TextView
                     android:id="@+id/activity_main_text_luminosity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="32sp"
                     android:text="Calculating..." />
             </LinearLayout>
             <LinearLayout
@@ -106,11 +118,14 @@
                    android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:paddingTop="8dp"
-                    android:text="Minecraft Time" />
+                   android:textColor="@color/colorWhite"
+                   android:text="Minecraft Time" />
                 <TextView
                     android:id="@+id/activity_main_text_time"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="32sp"
                     android:text="Calculating..." />
             </LinearLayout>
         </LinearLayout>
