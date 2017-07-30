@@ -6,15 +6,19 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import net.kronos.rkon.core.Rcon;
 import net.kronos.rkon.core.ex.AuthenticationException;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
 
@@ -28,7 +32,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private Button connectButton;
     private SensorEventListener sensorEventListener;
     private FrameLayout serverView;
-
+    private FrameLayout infoView;
+    private TextView luminosityView;
+    private TextView timeView;
+    float mineTime = 0;
 
 
     @Override
@@ -41,15 +48,20 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         passwordEditText = findViewById(R.id.activity_main_server_password);
         connectButton = findViewById(R.id.activity_main_button_connect);
         serverView = findViewById(R.id.activity_main_view_server);
+        luminosityView = findViewById(R.id.activity_main_text_luminosity);
+        timeView = findViewById(R.id.activity_main_text_time);
+        infoView = findViewById(R.id.activity_main_view_info);
 
         sensorEventListener = this;
 
         connectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                connectToServer();
                 sensorManager.registerListener(sensorEventListener, lightSensor, SensorManager.SENSOR_DELAY_UI);
-                serverView.setVisibility(View.GONE);
+                connectToServer();
+                serverView.setVisibility(View.INVISIBLE);
+                infoView.setVisibility(View.VISIBLE);
+
             }
         });
 
@@ -65,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             @Override
             public void run(){
                 try {
+                    Log.e("test", "Starting rcon");
                     rcon = new Rcon(
                             addressEditText.getText().toString(),
                             Integer.parseInt(portEditText.getText().toString()),
@@ -84,14 +97,15 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     public void onSensorChanged(SensorEvent sensorEvent) {
         final float light = sensorEvent.values[0];
         if (rcon != null){
-            final int mineTime = (int) ((light * 3000/DAY_LUMINOSITY_THRESHOLD) + 22000);
+            mineTime = (int) ((light * 3000/DAY_LUMINOSITY_THRESHOLD) + 22000);
+            luminosityView.setText(String.valueOf(light));
+            timeView.setText(String.valueOf(mineTime));
 
             // x = luminance
             // y = minecraft time
             // x : 3000 = y : 1000
             // y = (x * 3000/1000)
             // TODO: Explain why we're starting from 29000
-
 
             new Thread(new Runnable() {
                 @Override
@@ -108,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                     }
                 }
             }).start();
-
         }
 
     }
