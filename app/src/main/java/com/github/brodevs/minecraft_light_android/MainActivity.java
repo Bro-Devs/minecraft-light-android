@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private FrameLayout infoView;
     private TextView luminosityView;
     private TextView timeView;
-    float mineTime = 0;
+    private int mineTime = 0;
+    private Timer timer;
 
 
     @Override
@@ -59,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             public void onClick(View view) {
                 sensorManager.registerListener(sensorEventListener, lightSensor, SensorManager.SENSOR_DELAY_UI);
                 connectToServer();
+                sendRequestsToServer();
                 serverView.setVisibility(View.INVISIBLE);
                 infoView.setVisibility(View.VISIBLE);
 
@@ -69,6 +71,31 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
     }
 
+
+    private void sendRequestsToServer(){
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (rcon != null) {
+                    try {
+                        // If mineTime == 0 we haven't got readings from
+                        // light senor yet
+                        if (mineTime != 0) {
+                            if (mineTime > 29000) {
+                                Log.e("MinecraftLight", rcon.command("time set " + 29000));
+                            } else {
+                                Log.e("MinecraftLight", rcon.command("time set " + mineTime));
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }, 0, 1000);
+    }
 
 
     private void connectToServer(){
@@ -96,34 +123,25 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
         final float light = sensorEvent.values[0];
+
+
+        // We want one full sun cycle, so we go from 4:00 AM (22000) to 9:00 AM (22000 + 4000);
+        // Max span of light sensor is setted to 3000
+        // Max span of time in Minecraft is (22000+4000 - 22000) = 4000
+
+        // light:3000 = minecraft_time:4000
+
+        // So light * 4000 / 3000
+        // But since we start from Night (22000)
+        // (light * 4000 / 3000) + 22000
+
         if (rcon != null){
-            mineTime = (int) ((light * 3000/DAY_LUMINOSITY_THRESHOLD) + 22000);
+            mineTime = (int) ((light * 4000/3000) + 22000);
             luminosityView.setText(String.valueOf(light));
             timeView.setText(String.valueOf(mineTime));
 
-            // x = luminance
-            // y = minecraft time
-            // x : 3000 = y : 1000
-            // y = (x * 3000/1000)
             // TODO: Explain why we're starting from 29000
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-
-                    try {
-                        if (mineTime>29000) {
-                            rcon.command("time set " + 29000);
-                        } else {
-                            rcon.command("time set " + mineTime);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }).start();
         }
-
     }
 
     @Override
