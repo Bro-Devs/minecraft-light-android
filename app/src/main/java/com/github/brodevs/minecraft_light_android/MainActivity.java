@@ -42,6 +42,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView timeView;
     private int mineTime = 0;
     private Timer timer;
+    private EditText minecraftStartTime;
+    private EditText minecraftTimeMaxSpan;
+    private EditText lightSensorMaxSpan;
+    private Button updateButton;
 
 
     @Override
@@ -57,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         luminosityView = findViewById(R.id.activity_main_text_luminosity);
         timeView = findViewById(R.id.activity_main_text_time);
         infoView = findViewById(R.id.activity_main_view_info);
+        minecraftStartTime = findViewById(R.id.activity_main_minecraft_start_time);
+        minecraftTimeMaxSpan = findViewById(R.id.activity_main_minecraft_time_max_span);
+        lightSensorMaxSpan = findViewById(R.id.activity_main_light_sensor_max_span);
+        updateButton = findViewById(R.id.activity_main_button_update);
 
         sensorEventListener = this;
 
@@ -72,8 +80,17 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
             }
         });
 
+
+        updateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+              updateConstants();
+            }
+        });
+
         sensorManager = (SensorManager)getSystemService(SENSOR_SERVICE);
         lightSensor = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+
     }
 
 
@@ -124,6 +141,12 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
                 }
             }
         }).start();
+    }
+
+    private void updateConstants() {
+        MINECRAFT_TIME_MAX_SPAN = Integer.parseInt(minecraftTimeMaxSpan.getText().toString());
+        LIGHT_SENSOR_MAX_SPAN = Integer.parseInt(lightSensorMaxSpan.getText().toString());
+        MINECRAFT_START_TIME = Integer.parseInt(minecraftStartTime.getText().toString());
     }
 
     @Override
